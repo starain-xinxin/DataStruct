@@ -55,7 +55,36 @@ int main(){
     assert(k1->data == 'D');
     assert(k2 == NULL);
 
+    /* 3.打印集合 */
     DispTree(p);
+
+    /* 4.遍历 */
+    PreDisp(p);
+    InDisp(p);
+    PostDisp(p);
+
+    /* 5.节点总数 */
+    assert(NodeNum(p) == 7);
+
+    /* 6.输出叶子节点 */
+    DispLeaf(p);
+    printf("\n");
+
+    /* 7.输出查找节点的层级 */
+    assert(Level(p, 1, 'E') == 3);
+    assert(Level(p, 1, 'G') == 4);
+
+    /* 8.查看level级的节点个数 */
+    assert(NumberOfKLevelNodes(p, 0, 1) == 0);
+    assert(NumberOfKLevelNodes(p, 1, 1) == 1);
+    assert(NumberOfKLevelNodes(p, 2, 1) == 2);
+    assert(NumberOfKLevelNodes(p, 3, 1) == 3);
+    assert(NumberOfKLevelNodes(p, 4, 1) == 1);
+
+    /* 9.层次遍历 */
+    LevelOrder(p);
+
+
 
 
 }

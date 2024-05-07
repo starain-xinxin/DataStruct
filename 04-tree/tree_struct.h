@@ -13,6 +13,7 @@
 #define PTree_MaxSize 32
 #define MaxSons 5
 #define MaxSize 32
+#define MaxQueue 32
 
 /*节点数据类型*/
 typedef char Data;
@@ -82,6 +83,7 @@ void CreateBTree(BTNode** b, char* str){
             case '(':
                 top++;
                 stack[top] = p;
+                flag = 0;
                 break;
             case ')':
                 flag = 0;
@@ -155,9 +157,145 @@ void DispTree(BTNode* b){
     printf("\n");
 }
 
+/*-------------------------------3. 二叉树的递归遍历-------------------------------------------*/
+/*
+ * 先序遍历
+ * 根-左-右
+ * */
+void PreOrder(BTNode* b){
+    if(b){
+        printf("%c", b->data);
+        PreOrder(b->Lp);
+        PreOrder(b->Rp);
+    }
+}
+void PreDisp(BTNode* b){
+    PreOrder(b);
+    printf("\n");
+}
+
+/*
+ * 中序遍历
+ * 左-根-右
+ * */
+void InOrder(BTNode* b){
+    if(b){
+        InOrder(b->Lp);
+        printf("%c", b->data);
+        InOrder(b->Rp);
+    }
+}
+void InDisp(BTNode* b){
+    InOrder(b);
+    printf("\n");
+}
+
+/*
+ * 后序遍历
+ * 左-右-根
+ * */
+void PostOrder(BTNode* b){
+    if(b){
+        PostOrder(b->Lp);
+        PostOrder(b->Rp);
+        printf("%c", b->data);
+    }
+}
+void PostDisp(BTNode* b){
+    PostOrder(b);
+    printf("\n");
+}
 
 
+/*-------------------------------4. 一些树的递归的无聊问题-------------------------------------------*/
+/*
+ * 树的节点总数
+ * */
+int NodeNum(BTNode* b){
+    if(b==NULL) return 0;
+    return NodeNum(b->Rp) + NodeNum(b->Lp) + 1;
+}
+void DispNum(BTNode* b){
+    printf("%d", NodeNum(b));
+}
 
+/*
+ * 输出树的叶子节点
+ * */
+void DispLeaf(BTNode* b){
+    if(b == NULL) return;
+    if(!(b->Lp) && !(b->Rp))
+        printf("%c",b->data);
+    DispLeaf(b->Lp);
+    DispLeaf(b->Rp);
+}
 
+/*
+ * 查找指定data的节点所在树的层级
+ * */
+int Level(BTNode* b, int level, Data x){
+    if(b==NULL) return 0;
+    if(b->data == x)
+        return level;
+    else{
+        int L = Level(b->Lp, level+1, x);
+        if(L) return L;
+        else return Level(b->Rp, level+1, x);
+    }
+}
 
+/*
+ * 计算树的第k层的节点数
+ * */
+void KLevelNodes(BTNode* b, int AimLevel, int NodeLevel, int* mem_num){
+    if(b==NULL) return;
+    if(NodeLevel==AimLevel) *mem_num = *mem_num + 1;
+    else if(NodeLevel < AimLevel)  {
+        KLevelNodes(b->Rp, AimLevel, NodeLevel+1, mem_num);
+        KLevelNodes(b->Lp, AimLevel, NodeLevel+1, mem_num);
+    }
+    else return;
+}
+int NumberOfKLevelNodes(BTNode* b, int AimLevel, int NodeLevel){
+    int num = 0;
+    KLevelNodes(b, AimLevel, NodeLevel, &num);
+    return num;
+}
 
+/*
+ * TODO:树B PPT 例7-15，7-16
+ * */
+
+/*-------------------------------5. 树的非递归遍历-------------------------------------------*/
+
+/*-------------------------------6. 树的层次遍历-------------------------------------------*/
+void LevelOrder(BTNode* b){
+    BTNode *p;
+
+    // 1.定义一个队列
+    BTNode* queue[MaxQueue] = {0};
+    int top = -1;
+    int tail = -1;
+
+    // 2.初始化队列
+    if (b == NULL) return;
+    else queue[0] = b;
+    top++;
+    tail++;
+
+    // 3.遍历
+    while(top <= tail){
+        p = queue[top];
+        top++;
+        if(p->Lp) {
+            tail++;
+            queue[tail] = p->Lp;
+        }
+        if(p->Rp){
+            tail++;
+            queue[tail] = p->Rp;
+        }
+        printf("%c", p->data);
+    }
+    printf("\n");
+}
