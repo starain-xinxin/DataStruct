@@ -9,37 +9,43 @@
 #define MaxNode 60
 #define DEBUG 1
 
+/* 邻接表示节点 */
 typedef struct{
     int son[MaxSon];
     int num_of_son;
 }Node;
 
+/* 路径节点表示方法 */
 typedef struct{
     int jump;
     int index[MaxSon];
 }Point;
 
+/* 转移操作 */
 typedef struct {
     Point src;
     Point dst;
     int rank;
 }Op;
 
+/* 去除节点后，整理邻接表 */
 void clean(int* son, int num){
     int arr[MaxSon] = {0};
     for(int i=0; i<MaxSon; i++){
         arr[i] = son[i];
+        son[i] = 0;
     }
     // 按次序
     int idx = 0;
     for(int i=0; i<MaxSon; i++){
-        if(arr[i]){
+        if(arr[i] != 0){
             son[idx] = arr[i];
             idx++;
         }
     }
 }
 
+/* 将节点插入对应的位置 */
 void son_put(int* son, int rank, int src_idx){
     for(int i=MaxSon-2; i>=rank; i--){
         son[i+1] = son[i];
@@ -49,9 +55,11 @@ void son_put(int* son, int rank, int src_idx){
 
 int main(){
     int N,M;
+
+    /* 定义一个邻接表 */
     Node tree[MaxNode];
 
-    // 初始化tree
+    /*初始化tree 邻接表*/
     for(int nn=0; nn<MaxNode; nn++){
         tree[nn].num_of_son = 0;
         for(int nnn=0; nnn<MaxSon; nnn++){
@@ -59,8 +67,10 @@ int main(){
         }
     }
 
+    /* 接受第一行输入 */
     scanf("%d %d", &N, &M);
 
+    /* 接受邻接表 */
     int check[MaxNode] = {0};   // 用于check根节点
     for(int i=1; i<=N; i++){
         scanf("%d",&(tree[i].num_of_son));
@@ -72,16 +82,18 @@ int main(){
         }
     }
 
-    // 找出根节点
+    /* 找出根节点 */
     int root;
     for(root=1; root<=N; root++){
         if(!check[root]) break;
     }
 
-    // 进行操作
-    for(int ops=0; ops<M; ops++){   // M次操作
+    /* 进行操作 */
+    for(int ops=0; ops<M; ops++){   // M次操作，大循环
+
         // init一个操作,然后接受输入
         Op op;
+
         int src_jp, dst_jp;
 
         scanf("%d", &src_jp);
@@ -107,7 +119,7 @@ int main(){
         int father = root;
         int j1,j2;
         for(j1=0; j1<op.src.jump; j1++){
-            if (op.src.index[j1] > tree[toward].num_of_son) {j1;break;}
+            if (op.src.index[j1] >= tree[toward].num_of_son) {j1;break;}
             father = toward;
             toward = tree[toward].son[op.src.index[j1]];
         }
@@ -115,9 +127,16 @@ int main(){
         src_idx = toward;           // 范例：5
         src_father = father;        // 3
 
+        // 移动
+        //在src的父亲中删去
+        tree[src_father].num_of_son--;
+        tree[src_father].son[op.src.index[j1]] = 0;
+        // 重新整理
+        clean(tree[src_father].son, tree[src_father].num_of_son);
+
         toward = root;
         for(j2=0; j2<op.dst.jump; j2++){
-            if (op.dst.index[j2] > tree[toward].num_of_son) {j2; break;}
+            if (op.dst.index[j2] >= tree[toward].num_of_son) {j2; break;}
             father = toward;
             toward = tree[toward].son[op.dst.index[j2]];
         }
@@ -125,34 +144,28 @@ int main(){
         dst_idx = toward;           // 范例：7
         dst_father = father;        // 2
 
-        // 移动
-        //在src的父亲中删去
-        tree[src_father].num_of_son--;
-        tree[src_father].son[op.src.index[j1]] = 0;
-        // 重新整理
-        clean(tree[src_father].son, tree[src_father].num_of_son);
+
+
         // 添加src_idx进dst[rank]
         tree[dst_idx].num_of_son++;
-//        while(1){
-//            if(tree[dst_idx].son[op.rank] != 0) op.rank++;
-//            else break;
-//        }
         son_put(tree[dst_idx].son, op.rank, src_idx);
-//        tree[dst_idx].son[op.rank] = src_idx;
+        clean(tree[dst_idx].son, tree[dst_idx].num_of_son);
 
     }
 
     /* 输出 */
-
     if(DEBUG) printf("--------------\n");
+
     // 初始化一个队列
     int stack[MaxNode] = {0};
     int top = -1;
     int tail = -1;
+
     // 将头节点放入
     tail++; // 进队先tail++
     stack[tail] = root;
     top++;  // 标识下一次操作的idx
+
     // 层次遍历
     int ppp;
     while(top<=tail){
