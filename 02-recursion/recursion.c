@@ -24,6 +24,7 @@ void Hanoi1(int n,char X, char Y, char Z){
 }
 
 /* 2. 非递归版本的汉诺塔问题 */
+// TODO：
 typedef struct
 {  int n;			//盘片个数
     char x, y, z;		//3个塔座
