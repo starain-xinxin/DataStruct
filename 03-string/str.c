@@ -96,8 +96,8 @@ int KMPIndex(char* src, char* dst){
 }
 
 int main(){
-    char src[100] = "abcdabd";
-    char dst[100] = "bbc abcdab abcdabcdabde";
+    char src[MAXSIZE] = "abcdabd";
+    char dst[MAXSIZE] = "bbc abcdab abcdabcdabde";
 
     // 1. 暴力解法
     printf("%d\n", BruteForce(src, dst));
